@@ -1,0 +1,75 @@
+# Simple modbus power simulator
+
+# Setup
+1. Have bundler
+2. Run `bundle install`
+
+# Architecture
+```
+
+#                  LOAD1
+#                    O
+#                    |
+#                    |
+#                  LINE2
+#                    |
+#                    |
+#                    O----LINE3----O
+# GEN1 O----LINE1----O             O----LINE5----O LOAD2
+#                    O----LINE4----O
+#                                  O
+#                                  |
+#                                  |
+#                                LINE6
+#                                  |
+#                                  |
+#                                  O
+#                                LOAD3
+```
+
+Load 1 is 20, Load 2 is 40, and Load 3 is 50. The generator
+can provide enough power. Line limits are
+1. 120
+2. 30
+3. 60
+4. 60
+5. 75
+6. 75
+
+# Running
+## Simulator
+Run the simulator first (`bundle exec ruby simulator.rb`).
+The simulator runs on a 1s tick rate. The only output from
+the simulator is power in the lines (actual/max) and
+loads serviced/generator utilization (actual/max).
+
+While the simulator runs, power flow will update
+on each tick, and any overloaded lines will gain
+1 heat.
+
+This all happens "inside" the simulator (excessive line temp, 
+unserviced loads, or generator overload could
+be reported out-of-band to penalize).
+
+Each line runs as a different modbus server, which could be
+bound to a different interface to give the appearance
+of multiple servers/multiple devices. Currently, they all run
+on localhost and bind to different ports (1500 + line).
+
+## Monitor
+The monitor runs as a HMI would over Modbus. It displays
+temperature and state (open/closed).
+
+## Protection
+The protection runs separately, as if on some sort of
+centralized monitoring/protection server. It doesn't have
+any output, but will open (trip) a line if it goes
+over the threshold.
+
+Protection runs every 1 second.
+
+## Trip and Close
+Trip or close the numbered line.
+
+## Set Threshold
+Provide a line number and a new threshold.

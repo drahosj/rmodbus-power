@@ -1,0 +1,12 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    gserver (0.0.1)
+    rmodbus (1.3.2)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  gserver!
+  rmodbus!
